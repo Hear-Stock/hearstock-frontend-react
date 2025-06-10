@@ -15,7 +15,7 @@ export default function SphereCoordsViewer({ coords }) {
             <th>x</th>
             <th>y</th>
             <th>z</th>
-            <th>θ (rad)</th>
+            <th>θ (theta)</th>
             <th>φ (phi)</th>
           </tr>
         </thead>

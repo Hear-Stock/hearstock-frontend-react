@@ -18,7 +18,7 @@ export default function SphereSoundPlayer() {
       const p = coords[i];
 
       const panner = new Tone.Panner3D({
-        positionX: p.x,
+        positionX: -p.x,
         positionY: p.y,
         positionZ: p.z,
       }).toDestination();
@@ -28,8 +28,8 @@ export default function SphereSoundPlayer() {
         envelope: { attack: 0.01, decay: 0.1, sustain: 0.1, release: 0.1 },
       }).connect(panner);
 
-      tempSynth.triggerAttackRelease(p.freq, '8n'); // 🟡 주파수 사용
-      await sleep(100); // 간격
+      tempSynth.triggerAttackRelease(p.freq, '8n'); // 주파수 사용
+      await sleep(100);
     }
   };
 
