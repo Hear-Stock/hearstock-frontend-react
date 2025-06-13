@@ -37,7 +37,7 @@ export default function SphereSoundPlayer({ coords, setCurrentIndex }) {
 
       //tempSynth.triggerAttackRelease(p.freq, '8n'); // 🟡 주파수 사용
       tempSynth.triggerAttackRelease(440, '8n');
-      await sleep(300); // 간격
+      await sleep(100); // 간격
     }
   };
 

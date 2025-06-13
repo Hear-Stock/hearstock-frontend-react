@@ -11,6 +11,9 @@ function Home() {
       <button className="nav-button" onClick={() => navigate('/sphere')}>
         Sphere 좌표 보기
       </button>
+      <button className="nav-button" onClick={() => navigate('/hrtfdemo')}>
+        HRTF Demo
+      </button>
     </div>
   );
 }

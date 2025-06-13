@@ -18,18 +18,13 @@ export const convertToSphericalCoords = (data) => {
 
     // 가격 → φ (위일수록 고가)
     const normalized = (d.price - minPrice) / (maxPrice - minPrice);
-    //const phi = phiStart + (1 - normalized) * (phiEnd - phiStart);
+    const phi = phiStart + (1 - normalized) * (phiEnd - phiStart);
 
-    // const temp = Math.sin(phi);
-    // const x = Math.cos(theta) * temp;
-    // const y = Math.cos(phi);
-    // const z = Math.sin(theta) * temp;
-
-    // 가격을 z축으로!
-    const radius = 1;
-    const x = Math.cos(theta) * radius;
-    const y = -1 + normalized * 2;
-    const z = -1 + normalized * 2; // z축: -1 ~ +1 사이에서 가격 매핑
+    const temp = Math.sin(phi);
+    const x = Math.cos(theta) * temp;
+    const y = Math.cos(phi);
+    //const z = Math.sin(theta) * temp;
+    const z = -1 + normalized * 2;
 
     // 🔊 freq: 가격이 높을수록 높은 음 (200~1000Hz)
     const freq = 200 + normalized * 800;
