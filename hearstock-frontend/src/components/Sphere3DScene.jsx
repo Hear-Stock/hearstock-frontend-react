@@ -11,7 +11,7 @@ function Point({ position, color = 'grey' }) {
   );
 }
 
-export default function Sphere3DScene({ points }) {
+export default function Sphere3DScene({ points, currentIndex }) {
   const linePoints = points.map((p) => [p.x, p.y, p.z]);
 
   return (
@@ -23,7 +23,11 @@ export default function Sphere3DScene({ points }) {
 
         {/* 점들 */}
         {points.map((p, idx) => (
-          <Point key={idx} position={[p.x, p.y, p.z]} />
+          <Point
+            key={idx}
+            position={[p.x, p.y, p.z]}
+            color={idx === currentIndex ? 'red' : 'grey'}
+          />
         ))}
 
         {/* 선으로 연결 */}
