@@ -11,6 +11,7 @@ export default function SpherePage() {
   const coords = convertToSphericalCoords(sampleData);
   const points = convertToSphericalCoords(sampleData);
   const [currentIndex, setCurrentIndex] = useState(null);
+
   return (
     <div style={{ padding: '1rem' }}>
       <h2 style={{ textAlign: 'center' }}>Sphere 좌표 결과</h2>
