@@ -178,50 +178,26 @@ export default function SphereSoundPlayer({
   const applyExternalizePresetLevel = (level = 'basic') => {
     // 프리셋 테이블
     const table = {
-      low: {
-        ref: 0.5,
-        roll: 1.0,
-        d: 0.8,
-        late: 0.03,
-        high: -0.5,
-        asym: 0.18,
-      },
-      basic: {
-        ref: 2.0,
-        roll: 0.5,
-        d: 1.5,
-        late: 0.05,
-        high: -1.0,
-        asym: 0.25,
-      },
-      strong: {
-        ref: 3.0,
-        roll: 0.01,
-        d: 2.0,
-        late: 0.07,
-        high: -1.8,
-        asym: 0.32,
-      },
+      low: { d: 1.1, er: 0.1, late: 0.035, high: -0.8, asym: 0.18 },
+      basic: { d: 1.3, er: 0.12, late: 0.05, high: -1.2, asym: 0.25 },
+      strong: { d: 1.6, er: 0.16, late: 0.065, high: -1.8, asym: 0.32 },
     };
     const cfg = table[level] ?? table.basic;
 
-    // 거리/감쇠 곡선
-    const panner = pannerRef.current;
-    if (panner) {
-      panner.refDistance = cfg.ref;
-      panner.rolloffFactor = cfg.roll;
-      panner.positionZ.linearRampToValueAtTime(cfg.d, Tone.now() + 0.1);
-    }
-
-    // 잔향과 EQ
+    // 안전 가드 + 램프 적용
+    earlyGainRef.current?.gain.rampTo(cfg.er, 0.1);
     lateGainRef.current?.gain.rampTo(cfg.late, 0.2);
     eqRef.current?.high.rampTo(cfg.high, 0.2);
+    pannerRef.current?.positionZ.linearRampToValueAtTime(
+      cfg.d,
+      Tone.now() + 0.1
+    );
 
-    // 좌/우 공간 비대칭
+    // 좌/우 비대칭 강도도 갱신
     asymScaleRef.current = cfg.asym;
   };
 
-  /* 슬라이더에서 한 점만 재생하는 함수 */
+  /** 슬라이더에서 한 점만 재생하는 함수 */
   const playSingleTone = async (index) => {
     await ensureGraph();
     const p = coords[index];
@@ -326,13 +302,13 @@ export default function SphereSoundPlayer({
           <button
             key={level}
             className={`preset-btn ${extLevel === level ? 'active' : ''}`}
-            onClick={() => onClickPreset(level)}
+            onClick={() => setExtLevel(level)}
           >
             {level === 'low'
-              ? '외재화: 가까이'
+              ? '외재화: 낮음'
               : level === 'basic'
               ? '외재화: 기본'
-              : '외재화: 멀리'}
+              : '외재화: 강함'}
           </button>
         ))}
       </div>

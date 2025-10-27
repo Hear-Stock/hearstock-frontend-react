@@ -11,10 +11,6 @@ function Home() {
       <button className="nav-button" onClick={() => navigate('/sphere')}>
         Sphere 좌표 보기
       </button>
-      <p />
-      <button className="nav-button" onClick={() => navigate('/webView')}>
-        웹뷰 보기
-      </button>
     </div>
   );
 }
