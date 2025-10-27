@@ -1,63 +1,34 @@
-import React, { useEffect, useState } from 'react';
-import Sphere2DGraph from '../components/Sphere2DGraph';
+import React, { useState } from 'react';
+import SphereCoordsViewer from '../components/SphereCoordsViewer';
+import Sphere3DScene from '../components/Sphere3DScene';
 import SphereSoundPlayer from '../components/SphereSoundPlayer';
+import Sphere2DGraph from '../components/Sphere2DGraph';
+import { sampleData } from '../data/sampleData';
+import { convertToSphericalCoords } from '../utils/sphereUtils';
+
+import './SpherePage.css';
 
 export default function SpherePageWeb() {
-  const [stockData, setStockData] = useState([]);
+  const coords = convertToSphericalCoords(sampleData);
+  const points = convertToSphericalCoords(sampleData);
   const [currentIndex, setCurrentIndex] = useState(null);
 
-  // Flutter → React 통신 함수 등록
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-
-    window.updateStockChart = async ({ code, period, market }) => {
-      try {
-        const fullCode = code.includes('.') ? code : `${code}.KS`;
-        const url = `/api/stock/chart?code=${fullCode}&period=${period}&market=${market}`;
-
-        console.log('Fetching:', url);
-        const res = await fetch(url);
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-
-        const data = await res.json();
-        console.log('받아온 주가 데이터:', data);
-
-        setStockData(
-          data.map((d) => ({
-            date: d.date,
-            price: d.close, // 종가 기준
-            volume: d.volume,
-            rate: d.fluctuation_rate,
-          }))
-        );
-      } catch (err) {
-        console.error('주가 데이터 요청 실패:', err);
-      }
-    };
-
-    return () => {
-      delete window.updateStockChart;
-    };
-  }, []);
-
   return (
-    <div
-      style={{
-        background: '#121212',
-        color: 'white',
-        minHeight: '100vh',
-        padding: 20,
-      }}
-    >
-      <h2 style={{ textAlign: 'center', marginBottom: 20 }}>
-        📊 Stock Sound Chart
-      </h2>
-
-      {/* 2D 차트 */}
-      <Sphere2DGraph points={stockData} currentIndex={currentIndex} />
-
-      {/* 사운드 플레이어 */}
-      <SphereSoundPlayer coords={stockData} setCurrentIndex={setCurrentIndex} />
+    <div className="sphere-container">
+      <div className="sphere-left">
+        <SphereSoundPlayer
+          coords={coords}
+          currentIndex={currentIndex}
+          setCurrentIndex={setCurrentIndex}
+        />
+      </div>
+      <div className="sphere-center">
+        <Sphere3DScene points={points} currentIndex={currentIndex} />
+        <Sphere2DGraph points={points} currentIndex={currentIndex} />
+      </div>
+      <div className="sphere-right">
+        <SphereCoordsViewer coords={points} />
+      </div>
     </div>
   );
 }
