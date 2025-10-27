@@ -9,7 +9,7 @@ function Home() {
     <div className="home-container">
       <h1 className="home-title">Hearstock</h1>
       <button className="nav-button" onClick={() => navigate('/sphere')}>
-        Sphere 좌표 보기
+        Sphere 좌표 보기!
       </button>
     </div>
   );
