@@ -102,7 +102,7 @@ export default function SphereSoundPlayer({ coords, setCurrentIndex }) {
       panningModel: 'HRTF',
       positionX: 0,
       positionY: 0,
-      positionZ: 1.2,
+      positionZ: 100,
       refDistance: 1,
       rolloffFactor: 1,
       distanceModel: 'inverse',
@@ -129,8 +129,8 @@ export default function SphereSoundPlayer({ coords, setCurrentIndex }) {
     erWet.connect(bus);
 
     // ----- Late(얕은 잔향) 경로 -----
-    const lateRev = new Tone.Reverb({ decay: 0.6, preDelay: 0.02 });
-    await lateRev.generate();
+    const lateRev = new Tone.Reverb({ decay: 1.2, preDelay: 0.1 });
+    await lateRev.generate()
     const lateGain = new Tone.Gain(0.05);
     lateRev.connect(lateGain);
     lateGain.connect(bus);
@@ -170,11 +170,30 @@ export default function SphereSoundPlayer({ coords, setCurrentIndex }) {
   // 외재화 프리셋: 강도별 파라미터를 한 번에 적용
   const applyExternalizePresetLevel = (level = 'basic') => {
     // 프리셋 테이블
-    const table = {
-      low: { d: 1.1, er: 0.1, late: 0.035, high: -0.8, asym: 0.18 },
-      basic: { d: 1.3, er: 0.12, late: 0.05, high: -1.2, asym: 0.25 },
-      strong: { d: 1.6, er: 0.16, late: 0.065, high: -1.8, asym: 0.32 },
-    };
+const table = {
+  low: { 
+    d: 1.6,        // 살짝 머리 밖
+    er: 0.14,      // 초기반사 조금 더
+    late: 0.05,    // 레이트 약간
+    high: -1.5,    // 고역 조금 깎기
+    asym: 0.3      // 좌/우 방향감
+  },
+  basic: { 
+    d: 2.0,        // 확실히 머리 밖
+    er: 0.2,       // 반사음 존재감 ↑
+    late: 0.08,    // 공간 잔향 강화
+    high: -2.0,    // 고역 더 컷 → 멀리서 들림
+    asym: 0.4
+  },
+  strong: { 
+    d: 2.4,        // 좀 더 멀리
+    er: 0.25,      // 반사음 강하게
+    late: 0.12,    // 레이트 풍부
+    high: -2.5,    // 고역 많이 컷
+    asym: 0.5
+  },
+};
+
     const cfg = table[level] ?? table.basic;
 
     // 안전 가드 + 램프 적용
