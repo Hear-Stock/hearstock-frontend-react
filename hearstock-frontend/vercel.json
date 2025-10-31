@@ -2,5 +2,5 @@
   "builds": [{ "src": "package.json", "use": "@vercel/static-build" }],
   "outputDirectory": "build",
   "framework": "create-react-app",
-  "rewrites": [{ "source": "/(.*)", "destination": "/" }]
+  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
 }
