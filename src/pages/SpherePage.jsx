@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import SphereCoordsViewer from '../components/SphereCoordsViewer';
-import Sphere3DScene from '../components/Sphere3DScene';
+// import Sphere3DScene from '../components/Sphere3DScene';
 import SphereSoundPlayer from '../components/SphereSoundPlayer';
 import Sphere2DGraph from '../components/Sphere2DGraph';
 import { sampleData } from '../data/sampleData';
@@ -23,7 +23,7 @@ export default function SpherePage() {
         />
       </div>
       <div className="sphere-center">
-        <Sphere3DScene points={points} currentIndex={currentIndex} />
+        {/* <Sphere3DScene points={points} currentIndex={currentIndex} /> */}
         <Sphere2DGraph points={points} currentIndex={currentIndex} />
       </div>
       <div className="sphere-right">
