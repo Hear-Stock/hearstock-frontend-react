@@ -2,7 +2,6 @@
   "name": "hearstock-frontend",
   "version": "0.1.0",
   "private": true,
-  "homepage": ".",
   "dependencies": {
     "@react-three/drei": "^10.1.2",
     "@react-three/fiber": "^9.1.2",
