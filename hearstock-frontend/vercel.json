@@ -2,5 +2,12 @@
   "builds": [{ "src": "package.json", "use": "@vercel/static-build" }],
   "outputDirectory": "build",
   "framework": "create-react-app",
-  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
+  "rewrites": [
+    { "source": "/manifest.json", "destination": "/manifest.json" },
+    { "source": "/favicon.ico", "destination": "/favicon.ico" },
+    { "source": "/logo192.png", "destination": "/logo192.png" },
+    { "source": "/logo512.png", "destination": "/logo512.png" },
+    { "source": "/static/(.*)", "destination": "/static/$1" },
+    { "source": "/(.*)", "destination": "/index.html" }
+  ]
 }
