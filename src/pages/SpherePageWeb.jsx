@@ -49,23 +49,16 @@ export default function SpherePageWeb() {
         background: '#121212',
         color: 'white',
         minHeight: '100vh',
-        padding: 20,
+        padding: 12,
         overflowX: 'hidden',
+        maxWidth: '100%',
+        boxSizing: 'border-box',
       }}
     >
-      <h2 style={{ textAlign: 'center', marginBottom: 8 }}>
-        📊 Stock Sound Chart
-      </h2>
-
-      {metaInfo.code && (
-        <p style={{ textAlign: 'center', color: '#aaa', marginBottom: 20 }}>
-          {metaInfo.market} | {metaInfo.code} | 기간: {metaInfo.period}
-        </p>
-      )}
-
       {/* 2D 차트 */}
       {stockData.length > 0 ? (
         <Sphere2DGraph
+          style={{ width: '100%', maxWidth: '100%' }}
           points={stockData}
           currentIndex={currentIndex}
           onPointHover={setCurrentIndex}
