@@ -27,11 +27,12 @@ export default function SpherePageWeb() {
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
         const data = await res.json();
-        console.log('받아온 주가 데이터:', data);
+        console.log('sample row 0:', data[0]);
+        console.log(JSON.stringify(data.slice(0, 5), null, 2));
 
         setStockData(
           data.map((d) => ({
-            date: d.date,
+            date: d.timestamp,
             price: d.close, // 종가
             volume: d.volume,
             rate: d.fluctuation_rate,
