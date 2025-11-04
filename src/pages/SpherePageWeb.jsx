@@ -41,10 +41,6 @@ export default function SpherePageWeb() {
         console.error('주가 데이터 요청 실패:', err);
       }
     };
-
-    return () => {
-      delete window.updateStockChart;
-    };
   }, []);
 
   return (
