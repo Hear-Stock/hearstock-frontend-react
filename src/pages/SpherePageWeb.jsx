@@ -15,11 +15,11 @@ export default function SpherePageWeb() {
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
-    window.updateStockChart = async ({ code, period, market }) => {
+    window.updateStockChart = async ({ baseUrl, code, period, market }) => {
       try {
         setMetaInfo({ code, period, market });
 
-        const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
+        //const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
         const url = `${baseUrl}/api/stock/chart?code=${code}&period=${period}&market=${market}`;
 
         console.log('📡 Fetching from backend:', url);
