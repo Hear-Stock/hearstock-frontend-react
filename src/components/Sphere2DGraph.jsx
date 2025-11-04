@@ -11,6 +11,7 @@ import {
   ReferenceDot,
 } from 'recharts';
 import './Sphere2DGraph.css';
+import { CustomTooltip } from './CustomTooltip.jsx';
 
 export default function Sphere2DGraph({ points, currentIndex }) {
   const data = points.map((p, i) => ({
@@ -42,14 +43,14 @@ export default function Sphere2DGraph({ points, currentIndex }) {
           <CartesianGrid strokeDasharray="3 3" stroke="#eee" />
           <XAxis dataKey="date" tick={{ fontSize: 12 }} />
 
-          {/* ✅ Y축: 자동 스케일링 (0부터 시작 X) */}
+          {/* Y축: 자동 스케일링 (0부터 시작 X) */}
           <YAxis
             domain={[minPrice - margin, maxPrice + margin]}
             tick={{ fontSize: 12 }}
             tickFormatter={(v) => v.toLocaleString()} // 천단위 구분
           />
 
-          <Tooltip
+          {/* <Tooltip
             contentStyle={{
               backgroundColor: 'rgba(255,255,255,0.9)',
               borderRadius: '10px',
@@ -58,7 +59,8 @@ export default function Sphere2DGraph({ points, currentIndex }) {
             }}
             labelStyle={{ fontWeight: 600, color: '#333' }}
             formatter={(value) => [`₩${value.toLocaleString()}`, 'Price']}
-          />
+          /> */}
+          <Tooltip content={<CustomTooltip />} />
 
           <Legend verticalAlign="top" height={30} iconType="line" />
 

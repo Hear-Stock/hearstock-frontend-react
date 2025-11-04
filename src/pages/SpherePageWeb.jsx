@@ -33,6 +33,9 @@ export default function SpherePageWeb() {
         setStockData(
           data.map((d) => ({
             date: d.timestamp,
+            open: d.open,
+            high: d.high,
+            low: d.low,
             price: d.close, // 종가
             volume: d.volume,
             rate: d.fluctuation_rate,
