@@ -33,7 +33,7 @@ export default function Sphere2DGraph({ points, currentIndex }) {
 
   return (
     <div className="graph-wrapper">
-      <ResponsiveContainer width="100%" height="100%">
+      <ResponsiveContainer width="100%" height={400}>
         <LineChart
           data={data}
           margin={{ top: 20, right: 30, left: 30, bottom: 0 }}
