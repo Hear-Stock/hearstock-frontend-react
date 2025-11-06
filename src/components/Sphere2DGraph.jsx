@@ -36,7 +36,7 @@ export default function Sphere2DGraph({ points, currentIndex }) {
       <ResponsiveContainer width="100%" height={400}>
         <LineChart
           data={data}
-          margin={{ top: 20, right: 30, left: 30, bottom: 0 }}
+          margin={{ top: 20, right: 30, left: 10, bottom: 0 }}
         >
           <defs>
             <linearGradient id="colorPrice" x1="0" y1="0" x2="0" y2="1">
@@ -51,7 +51,7 @@ export default function Sphere2DGraph({ points, currentIndex }) {
           <YAxis
             domain={[minPrice - margin, maxPrice + margin]}
             tick={false}
-            width={0}
+            width={20}
             tickFormatter={(v) => v.toLocaleString()} // 천단위 구분
           />
           <Tooltip content={<CustomTooltip />} />
