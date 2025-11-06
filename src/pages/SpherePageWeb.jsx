@@ -14,7 +14,44 @@ export default function SpherePageWeb() {
 
     window.updateStockChart = async ({ baseUrl, code, period, market }) => {
       try {
-        //const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
+        // period가 'live'인 경우: WebSocket 사용
+        if (period === 'live') {
+          const wsUrl = `wss://${baseUrl.replace(/^https?:\/\//, '')}/api/stock/ws/trade-price`;
+          console.log('🔌 Connecting to WebSocket:', wsUrl);
+
+          const socket = new WebSocket(wsUrl);
+
+          socket.onopen = () => {
+            console.log('WebSocket connected');
+            socket.send(JSON.stringify({ action: 'subscribe', code }));
+          };
+
+          socket.onmessage = (event) => {
+            const msg = JSON.parse(event.data);
+            console.log('Live Data:', msg);
+
+            const { current_price, fluctuation_rate, volume } = msg;
+
+            setRawData((prev) => [
+              ...prev.slice(-99), // 최근 100개만 유지
+              {
+                timestamp: Date.now(),
+                open: current_price,
+                high: current_price,
+                low: current_price,
+                close: current_price,
+                volume,
+                fluctuation_rate,
+              },
+            ]);
+          };
+
+          socket.onerror = (err) => console.error('WebSocket error:', err);
+          socket.onclose = () => console.log('WebSocket closed');
+          return; // WebSocket 모드일 땐 fetch 생략
+        }
+
+        // 일반 모드: 기존 REST API 사용
         const url = `${baseUrl}/api/stock/chart?code=${code}&period=${period}&market=${market}`;
 
         console.log('📡 Fetching from backend:', url);
