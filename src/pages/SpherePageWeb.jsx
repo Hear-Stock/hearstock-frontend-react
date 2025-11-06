@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import Sphere2DGraph from '../components/Sphere2DGraph';
 import SphereSoundPlayer from '../components/SphereSoundPlayer';
 import { convertToSphericalCoords } from '../utils/sphereUtils';
@@ -6,6 +6,7 @@ import { convertToSphericalCoords } from '../utils/sphereUtils';
 export default function SpherePageWeb() {
   const [stockData, setStockData] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(null);
+  const [rawData, setRawData] = useState([]);
 
   // Flutter → React 데이터 수신
   useEffect(() => {
@@ -33,14 +34,19 @@ export default function SpherePageWeb() {
           volume: d.volume,
           fluctuation_rate: d.fluctuation_rate,
         }));
-
-        const sphereCoords = convertToSphericalCoords(mapped);
-        setStockData(sphereCoords);
+        setRawData(mapped);
       } catch (err) {
         console.error('주가 데이터 요청 실패:', err);
       }
     };
   }, []);
+
+  const sphereCoords = useMemo(
+    () => convertToSphericalCoords(rawData),
+    [rawData]
+  );
+
+  setStockData(sphereCoords);
 
   return (
     <div
