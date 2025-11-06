@@ -1,15 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import Sphere2DGraph from '../components/Sphere2DGraph';
 import SphereSoundPlayer from '../components/SphereSoundPlayer';
+import { convertToSphericalCoords } from '../utils/sphereUtils';
 
 export default function SpherePageWeb() {
   const [stockData, setStockData] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(null);
-  const [metaInfo, setMetaInfo] = useState({
-    code: '',
-    period: '',
-    market: '',
-  });
 
   // Flutter → React 데이터 수신
   useEffect(() => {
@@ -17,8 +13,6 @@ export default function SpherePageWeb() {
 
     window.updateStockChart = async ({ baseUrl, code, period, market }) => {
       try {
-        setMetaInfo({ code, period, market });
-
         //const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
         const url = `${baseUrl}/api/stock/chart?code=${code}&period=${period}&market=${market}`;
 
@@ -30,17 +24,18 @@ export default function SpherePageWeb() {
         console.log('sample row 0:', data[0]);
         console.log(JSON.stringify(data.slice(0, 5), null, 2));
 
-        setStockData(
-          data.map((d) => ({
-            date: d.timestamp,
-            open: d.open,
-            high: d.high,
-            low: d.low,
-            price: d.close, // 종가
-            volume: d.volume,
-            rate: d.fluctuation_rate,
-          }))
-        );
+        const mapped = data.map((d) => ({
+          timestamp: d.timestamp,
+          open: d.open,
+          high: d.high,
+          low: d.low,
+          price: d.close,
+          volume: d.volume,
+          fluctuation_rate: d.fluctuation_rate,
+        }));
+
+        const sphereCoords = convertToSphericalCoords(mapped);
+        setStockData(sphereCoords);
       } catch (err) {
         console.error('주가 데이터 요청 실패:', err);
       }
@@ -50,7 +45,7 @@ export default function SpherePageWeb() {
   return (
     <div
       style={{
-        background: '#121212',
+        background: '#191919',
         color: 'white',
         minHeight: '100vh',
         padding: 12,

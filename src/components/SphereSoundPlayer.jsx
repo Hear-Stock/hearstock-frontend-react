@@ -318,8 +318,6 @@ export default function SphereSoundPlayer({
 
   return (
     <div className="sound-player">
-      <h3 className="sound-title">🔊 Sphere Sound Controller</h3>
-
       {/* 외재화 프리셋 버튼 */}
       <div className="preset-buttons">
         {['low', 'basic', 'strong'].map((level) => (
@@ -340,22 +338,22 @@ export default function SphereSoundPlayer({
       {/* 전체 재생 / 정지 */}
       <div className="control-buttons">
         <button className="play-btn" onClick={handlePlay} disabled={isPlaying}>
-          ▶ 전체 재생
+          전체 재생
         </button>
-        <button className="stop-btn" onClick={handleStop}>
-          ⏹ 정지
+        <button className="play-btn" onClick={handleStop}>
+          정지
         </button>
       </div>
 
       {/* 인덱스 슬라이더 */}
       <div className="slider-section">
-        <div className="slider-label">
+        {/* <div className="slider-label">
           <p>
             {Number.isFinite(currentIndex)
               ? `현재 인덱스: ${currentIndex + 1}/${coords.length}`
               : `현재 인덱스: 0/${coords.length}`}
           </p>
-        </div>
+        </div> */}
 
         <div className="slider-box">
           <input
