@@ -31,7 +31,7 @@ export default function Sphere2DGraph({ points, currentIndex }) {
       <ResponsiveContainer width="100%" height="90%">
         <LineChart
           data={data}
-          margin={{ top: 20, right: 30, left: 10, bottom: 10 }}
+          margin={{ top: 20, right: 30, left: 0, bottom: 10 }}
         >
           <defs>
             <linearGradient id="colorPrice" x1="0" y1="0" x2="0" y2="1">
@@ -41,12 +41,14 @@ export default function Sphere2DGraph({ points, currentIndex }) {
           </defs>
 
           <CartesianGrid strokeDasharray="3 3" stroke="#eee" />
-          <XAxis dataKey="date" tick={{ fontSize: 12 }} />
+          <XAxis dataKey="date" tick={false} />
 
           {/* Y축: 자동 스케일링 (0부터 시작 X) */}
           <YAxis
             domain={[minPrice - margin, maxPrice + margin]}
-            tick={{ fontSize: 12 }}
+            tick={false}
+            axisLine={false}
+            width={30}
             tickFormatter={(v) => v.toLocaleString()} // 천단위 구분
           />
 

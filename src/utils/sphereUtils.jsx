@@ -1,7 +1,4 @@
 export const convertToSphericalCoords = (data) => {
-  // const prices = data.map((d) => d.price);
-  // const minPrice = Math.min(...prices);
-  // const maxPrice = Math.max(...prices);
   const prices = data.map((d) => d.close);
   const minPrice = Math.min(...prices);
   const maxPrice = Math.max(...prices);
@@ -38,8 +35,6 @@ export const convertToSphericalCoords = (data) => {
     const freq = minFreq * Math.pow(maxFreq / minFreq, normalized);
 
     return {
-      // date: d.date,
-      // price: d.price,
       date: d.timestamp,
       price: d.close,
       x: Number(x.toFixed(4)),
