@@ -37,6 +37,8 @@ export default function Sphere2DGraph({ points, currentIndex }) {
         <LineChart
           data={data}
           margin={{ top: 20, right: 30, left: 10, bottom: 0 }}
+          onTouchMove={(e) => {}}
+          onTouchStart={(e) => {}}
         >
           <defs>
             <linearGradient id="colorPrice" x1="0" y1="0" x2="0" y2="1">

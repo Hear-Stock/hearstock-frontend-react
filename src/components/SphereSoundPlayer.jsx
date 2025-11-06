@@ -359,6 +359,9 @@ export default function SphereSoundPlayer({
             value={currentIndex ?? 0}
             onChange={(e) => handleSliderChange(Number(e.target.value))}
             className="slider-extended"
+            style={{ touchAction: 'pan-x' }}
+            onTouchStart={() => {}}
+            onTouchMove={() => {}}
           />
         </div>
       </div>

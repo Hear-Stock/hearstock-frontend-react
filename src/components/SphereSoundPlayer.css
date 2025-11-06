@@ -108,6 +108,7 @@
   touch-action: pan-x;
   user-select: none;
   -webkit-user-select: none;
+  pointer-events: auto;
 }
 
 /* 슬라이더 본체 */
