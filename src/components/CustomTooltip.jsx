@@ -7,24 +7,41 @@ export function CustomTooltip({ active, payload, label }) {
     <div
       style={{
         backgroundColor: 'rgba(255,255,255,0.95)',
-        padding: 10,
+        padding: 15,
         borderRadius: 10,
         border: '1px solid #ddd',
         fontSize: 13,
         color: '#333',
         lineHeight: 1.4,
-        minWidth: 140,
+        minWidth: 110,
       }}
     >
       <div>
-        <b>{d.date}</b>
+        <b>{d.timestamp}</b>
       </div>
-      <div>종가 : ₩{d.price.toLocaleString()}</div>
-      <div>시가 : ₩{d.open.toLocaleString()}</div>
-      <div>고가 : ₩{d.high.toLocaleString()}</div>
-      <div>저가 : ₩{d.low.toLocaleString()}</div>
-      <div>거래량 : {d.volume.toLocaleString()}</div>
-      <div>등락률 : {d.fluctuation_rate}%</div>
+      <div>
+        <span style={{ fontWeight: 700 }}>종가</span> :{' '}
+        {d.price.toLocaleString()}원
+      </div>
+      <div>
+        <span style={{ fontWeight: 700 }}>시가</span> :{' '}
+        {d.open.toLocaleString()}원
+      </div>
+      <div>
+        <span style={{ fontWeight: 700 }}>고가</span> :{' '}
+        {d.high.toLocaleString()}원
+      </div>
+      <div>
+        <span style={{ fontWeight: 700 }}>저가</span> : {d.low.toLocaleString()}
+        원
+      </div>
+      <div>
+        <span style={{ fontWeight: 700 }}>거래량</span> :{'     '}
+        {d.volume.toLocaleString()}
+      </div>
+      <div>
+        <span style={{ fontWeight: 700 }}>등락률</span> : {d.fluctuation_rate}%
+      </div>
     </div>
   );
 }

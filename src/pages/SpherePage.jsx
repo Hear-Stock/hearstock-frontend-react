@@ -11,6 +11,7 @@ import './SpherePage.css';
 export default function SpherePage() {
   const coords = convertToSphericalCoords(sampleData);
   const points = convertToSphericalCoords(sampleData);
+
   const [currentIndex, setCurrentIndex] = useState(null);
 
   return (

@@ -16,12 +16,12 @@ import { CustomTooltip } from './CustomTooltip.jsx';
 export default function Sphere2DGraph({ points, currentIndex }) {
   const data = points.map((p, i) => ({
     date: p.date,
-    close: p.price,
+    price: p.price,
     open: p.open,
     high: p.high,
     low: p.low,
     volume: p.volume,
-    rate: p.fluctuation_rate,
+    fluctuation_rate: p.fluctuation_rate,
     active: i === currentIndex,
   }));
 
@@ -33,40 +33,27 @@ export default function Sphere2DGraph({ points, currentIndex }) {
 
   return (
     <div className="graph-wrapper">
-      <ResponsiveContainer width="100%" height="90%">
+      <ResponsiveContainer width="100%" height="100%">
         <LineChart
           data={data}
-          margin={{ top: 20, right: 30, left: 0, bottom: 10 }}
+          margin={{ top: 20, right: 30, left: 30, bottom: 0 }}
         >
           <defs>
             <linearGradient id="colorPrice" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#1976d2" stopOpacity={0.8} />
-              <stop offset="100%" stopColor="#1976d2" stopOpacity={0.1} />
+              <stop offset="0%" stopColor="#191919" stopOpacity={0.8} />
+              <stop offset="100%" stopColor="#191919" stopOpacity={0.1} />
             </linearGradient>
           </defs>
 
           <CartesianGrid strokeDasharray="3 3" stroke="#eee" />
           <XAxis dataKey="date" tick={false} />
 
-          {/* Y축: 자동 스케일링 (0부터 시작 X) */}
           <YAxis
             domain={[minPrice - margin, maxPrice + margin]}
             tick={false}
-            axisLine={false}
-            width={30}
+            width={0}
             tickFormatter={(v) => v.toLocaleString()} // 천단위 구분
           />
-
-          {/* <Tooltip
-            contentStyle={{
-              backgroundColor: 'rgba(255,255,255,0.9)',
-              borderRadius: '10px',
-              border: '1px solid #ddd',
-              boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-            }}
-            labelStyle={{ fontWeight: 600, color: '#333' }}
-            formatter={(value) => [`₩${value.toLocaleString()}`, 'Price']}
-          /> */}
           <Tooltip content={<CustomTooltip />} />
 
           <Legend verticalAlign="top" height={30} iconType="line" />
@@ -76,8 +63,8 @@ export default function Sphere2DGraph({ points, currentIndex }) {
             dataKey="price"
             stroke="url(#colorPrice)"
             strokeWidth={2.5}
-            dot={{ r: 4, fill: '#1976d2' }}
-            activeDot={{ r: 6, fill: '#1976d2' }}
+            dot={{ r: 4, fill: '#191919' }}
+            activeDot={{ r: 6, fill: '#191919' }}
             isAnimationActive={true}
           />
 

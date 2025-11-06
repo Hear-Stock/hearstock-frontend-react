@@ -37,6 +37,11 @@ export const convertToSphericalCoords = (data) => {
     return {
       date: d.timestamp,
       price: d.close,
+      open: d.open,
+      high: d.high,
+      low: d.low,
+      volume: d.volume,
+      fluctuation_rate: d.fluctuation_rate,
       x: Number(x.toFixed(4)),
       y: Number(y.toFixed(4)),
       z: Number(z.toFixed(4)),
