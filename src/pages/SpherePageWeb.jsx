@@ -46,7 +46,9 @@ export default function SpherePageWeb() {
     [rawData]
   );
 
-  setStockData(sphereCoords);
+  useEffect(() => {
+    setStockData(sphereCoords);
+  }, [sphereCoords]);
 
   return (
     <div
