@@ -17,7 +17,7 @@ export function CustomTooltip({ active, payload, label }) {
       }}
     >
       <div>
-        <b>{d.timestamp}</b>
+        <b>{d.date}</b>
       </div>
       <div>
         <span style={{ fontWeight: 700 }}>종가</span> :{' '}
