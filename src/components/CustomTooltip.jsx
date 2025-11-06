@@ -19,12 +19,12 @@ export function CustomTooltip({ active, payload, label }) {
       <div>
         <b>{d.date}</b>
       </div>
-      <div>종가 : ₩{d.close.toLocaleString()}</div>
+      <div>종가 : ₩{d.price.toLocaleString()}</div>
       <div>시가 : ₩{d.open.toLocaleString()}</div>
       <div>고가 : ₩{d.high.toLocaleString()}</div>
       <div>저가 : ₩{d.low.toLocaleString()}</div>
       <div>거래량 : {d.volume.toLocaleString()}</div>
-      <div>등락률 : {d.rate}%</div>
+      <div>등락률 : {d.fluctuation_rate}%</div>
     </div>
   );
 }

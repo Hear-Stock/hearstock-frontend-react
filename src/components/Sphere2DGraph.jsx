@@ -16,7 +16,12 @@ import { CustomTooltip } from './CustomTooltip.jsx';
 export default function Sphere2DGraph({ points, currentIndex }) {
   const data = points.map((p, i) => ({
     date: p.date,
-    price: p.price,
+    close: p.price,
+    open: p.open,
+    high: p.high,
+    low: p.low,
+    volume: p.volume,
+    rate: p.fluctuation_rate,
     active: i === currentIndex,
   }));
 

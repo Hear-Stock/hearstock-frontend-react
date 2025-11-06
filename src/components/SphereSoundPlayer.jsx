@@ -326,11 +326,7 @@ export default function SphereSoundPlayer({
             className={`preset-btn ${extLevel === level ? 'active' : ''}`}
             onClick={() => onClickPreset(level)}
           >
-            {level === 'low'
-              ? '외재화: 가까이'
-              : level === 'basic'
-              ? '외재화: 기본'
-              : '외재화: 멀리'}
+            {level === 'low' ? '가까이' : level === 'basic' ? '기본' : '멀리'}
           </button>
         ))}
       </div>
