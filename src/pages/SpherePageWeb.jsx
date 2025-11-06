@@ -25,7 +25,7 @@ export default function SpherePageWeb() {
         console.log(JSON.stringify(data.slice(0, 5), null, 2));
 
         const mapped = data.map((d) => ({
-          timestamp: d.timestamp,
+          date: d.timestamp,
           open: d.open,
           high: d.high,
           low: d.low,
