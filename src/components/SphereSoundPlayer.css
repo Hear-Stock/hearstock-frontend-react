@@ -103,6 +103,13 @@
   justify-content: center;
 }
 
+.slider-box,
+.slider-extended {
+  touch-action: pan-x;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
 /* 슬라이더 본체 */
 .slider-extended {
   width: 100%;
