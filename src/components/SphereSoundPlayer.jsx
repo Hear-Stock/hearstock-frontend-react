@@ -321,7 +321,7 @@ export default function SphereSoundPlayer({
     // 현재 live 모드 판단 rule: coords가 1~3개 정도만 존재 + websocket으로만 업데이트 되는 구조일 때
     if (!coords || coords.length < 1) return;
 
-    let p = coords[coords.length - 1]; // 실시간은 마지막 index가 최신
+    if (coords.length > 3) return;
 
     (async () => {
       await ensureGraph();
@@ -329,6 +329,8 @@ export default function SphereSoundPlayer({
       const synth = synthRef.current;
       const panner = pannerRef.current;
       if (!synth || !panner) return;
+
+      const p = coords[coords.length - 1];
 
       // 처음 들어올 때 Attack 한번만
       if (!synth._liveMode) {
