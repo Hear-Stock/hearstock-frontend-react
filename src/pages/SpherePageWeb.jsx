@@ -8,20 +8,19 @@ export default function SpherePageWeb() {
   const [currentIndex, setCurrentIndex] = useState(null);
   const [rawData, setRawData] = useState([]);
 
-  let socket = null;
+  const socketRef = React.useRef(null);
 
   // Flutter → React 데이터 수신
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
     window.updateStockChart = async ({ baseUrl, code, period, market }) => {
-      try {
-        // 만약 이전 websocket 살아있으면 닫기
-        if (socket) {
-          socket.close();
-          socket = null;
-        }
+      if (socketRef.current) {
+        socketRef.current.close();
+        socketRef.current = null;
+      }
 
+      try {
         // period가 'current_price'인 경우: WebSocket 사용
         if (period === 'current_price') {
           const wsUrl = `wss://${baseUrl.replace(
@@ -30,14 +29,16 @@ export default function SpherePageWeb() {
           )}/api/stock/ws/trade-price`;
           console.log('🔌 Connecting to WebSocket:', wsUrl);
 
-          const socket = new WebSocket(wsUrl);
+          socketRef.current = new WebSocket(wsUrl);
 
-          socket.onopen = () => {
+          socketRef.current.onopen = () => {
             console.log('WebSocket connected');
-            socket.send(JSON.stringify({ action: 'subscribe', code }));
+            socketRef.current.send(
+              JSON.stringify({ action: 'subscribe', code })
+            );
           };
 
-          socket.onmessage = (event) => {
+          socketRef.current.onmessage = (event) => {
             const msg = JSON.parse(event.data);
             console.log('Live Data:', msg);
 
@@ -57,8 +58,9 @@ export default function SpherePageWeb() {
             ]);
           };
 
-          socket.onerror = (err) => console.error('WebSocket error:', err);
-          socket.onclose = () => console.log('WebSocket closed');
+          socketRef.current.onerror = (err) =>
+            console.error('WebSocket error:', err);
+          socketRef.current.onclose = () => console.log('WebSocket closed');
 
           return; // WebSocket 모드일 땐 fetch 생략
         } else {
