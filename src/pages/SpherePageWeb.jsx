@@ -51,30 +51,31 @@ export default function SpherePageWeb() {
 
           socket.onerror = (err) => console.error('WebSocket error:', err);
           socket.onclose = () => console.log('WebSocket closed');
+
           return; // WebSocket 모드일 땐 fetch 생략
+        } else {
+          // 일반 모드: 기존 REST API 사용
+          const url = `${baseUrl}/api/stock/chart?code=${code}&period=${period}&market=${market}`;
+
+          console.log('📡 Fetching from backend:', url);
+          const res = await fetch(url);
+          if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+          const data = await res.json();
+          console.log('sample row 0:', data[0]);
+          console.log(JSON.stringify(data.slice(0, 5), null, 2));
+
+          const mapped = data.map((d) => ({
+            timestamp: d.timestamp,
+            open: d.open,
+            high: d.high,
+            low: d.low,
+            close: d.close,
+            volume: d.volume,
+            fluctuation_rate: d.fluctuation_rate,
+          }));
+          setRawData(mapped);
         }
-
-        // 일반 모드: 기존 REST API 사용
-        const url = `${baseUrl}/api/stock/chart?code=${code}&period=${period}&market=${market}`;
-
-        console.log('📡 Fetching from backend:', url);
-        const res = await fetch(url);
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-
-        const data = await res.json();
-        console.log('sample row 0:', data[0]);
-        console.log(JSON.stringify(data.slice(0, 5), null, 2));
-
-        const mapped = data.map((d) => ({
-          timestamp: d.timestamp,
-          open: d.open,
-          high: d.high,
-          low: d.low,
-          close: d.close,
-          volume: d.volume,
-          fluctuation_rate: d.fluctuation_rate,
-        }));
-        setRawData(mapped);
       } catch (err) {
         console.error('주가 데이터 요청 실패:', err);
       }
