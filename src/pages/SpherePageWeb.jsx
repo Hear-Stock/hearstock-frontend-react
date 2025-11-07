@@ -14,9 +14,12 @@ export default function SpherePageWeb() {
 
     window.updateStockChart = async ({ baseUrl, code, period, market }) => {
       try {
-        // period가 'live'인 경우: WebSocket 사용
-        if (period === 'live') {
-          const wsUrl = `wss://${baseUrl.replace(/^https?:\/\//, '')}/api/stock/ws/trade-price`;
+        // period가 'current_price'인 경우: WebSocket 사용
+        if (period === 'current_price') {
+          const wsUrl = `wss://${baseUrl.replace(
+            /^https?:\/\//,
+            ''
+          )}/api/stock/ws/trade-price`;
           console.log('🔌 Connecting to WebSocket:', wsUrl);
 
           const socket = new WebSocket(wsUrl);
