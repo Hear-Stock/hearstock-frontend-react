@@ -316,6 +316,47 @@ export default function SphereSoundPlayer({
     }
   };
 
+  // LIVE continuous mode
+  useEffect(() => {
+    // 현재 live 모드 판단 rule: coords가 1~3개 정도만 존재 + websocket으로만 업데이트 되는 구조일 때
+    if (!coords || coords.length < 1) return;
+
+    let p = coords[coords.length - 1]; // 실시간은 마지막 index가 최신
+
+    (async () => {
+      await ensureGraph();
+
+      const synth = synthRef.current;
+      const panner = pannerRef.current;
+      if (!synth || !panner) return;
+
+      // 처음 들어올 때 Attack 한번만
+      if (!synth._liveMode) {
+        synth._liveMode = true;
+        synth.triggerAttack(p.freq);
+      }
+
+      const t = Tone.now() + 0.05;
+
+      panner.positionX.linearRampToValueAtTime(p.x, t);
+      panner.positionY.linearRampToValueAtTime(p.y, t);
+      panner.positionZ.linearRampToValueAtTime(-p.z, t);
+
+      // tone freq continuous ramp
+      synth.frequency.linearRampToValueAtTime(p.freq, t);
+    })();
+
+    // unmount / normal mode로 돌아가면 release
+    return () => {
+      if (synthRef.current?._liveMode) {
+        try {
+          synthRef.current.triggerRelease();
+        } catch (_) {}
+        synthRef.current._liveMode = false;
+      }
+    };
+  }, [coords]);
+
   return (
     <div className="sound-player">
       {/* 외재화 프리셋 버튼 */}
