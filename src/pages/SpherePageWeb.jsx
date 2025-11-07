@@ -8,10 +8,8 @@ export default function SpherePageWeb() {
   const [currentIndex, setCurrentIndex] = useState(null);
   const [rawData, setRawData] = useState([]);
 
-  // WebSocket 참조 저장
   const wsRef = useRef(null);
 
-  // 최근 100개 데이터 유지 + 안전하게 업데이트
   const handleLiveData = (msg) => {
     setRawData((prev) => {
       const last = prev[prev.length - 1] || {};
@@ -28,7 +26,6 @@ export default function SpherePageWeb() {
     });
   };
 
-  // Flutter → React 실시간 데이터 수신
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
@@ -43,21 +40,24 @@ export default function SpherePageWeb() {
     };
   }, []);
 
-  // Flutter → React 일반 데이터 / WebSocket 모드
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
     window.updateStockChart = async ({ baseUrl, code, period, market }) => {
-      // live 모드면 WebSocket 연결
       if (period === 'live') {
-        if (wsRef.current) {
-          console.log('WebSocket 이미 연결되어 있음.');
-          return;
-        }
+        if (wsRef.current) return;
+
+        setRawData([{
+          timestamp: Date.now(),
+          open: 0,
+          high: 0,
+          low: 0,
+          close: 0,
+          volume: 0,
+          fluctuation_rate: 0,
+        }]);
 
         const wsUrl = `wss://${baseUrl.replace(/^https?:\/\//, '')}/api/stock/ws/trade-price`;
-        console.log('🔌 Connecting to WebSocket:', wsUrl);
-
         const socket = new WebSocket(wsUrl);
         wsRef.current = socket;
 
@@ -80,13 +80,10 @@ export default function SpherePageWeb() {
         return;
       }
 
-      // 일반 모드: REST API 호출
       try {
         const url = `${baseUrl}/api/stock/chart?code=${code}&period=${period}&market=${market}`;
-        console.log('📡 Fetching from backend:', url);
         const res = await fetch(url);
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
-
         const data = await res.json();
         const mapped = data.map((d) => ({
           timestamp: d.timestamp,
@@ -104,10 +101,8 @@ export default function SpherePageWeb() {
     };
   }, []);
 
-  // rawData → 3D 좌표 변환
   const sphereCoords = useMemo(() => convertToSphericalCoords(rawData), [rawData]);
 
-  // sphereCoords → 2D 차트 데이터
   useEffect(() => {
     setStockData(sphereCoords);
   }, [sphereCoords]);
