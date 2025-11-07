@@ -34,7 +34,7 @@ export default function SpherePageWeb() {
           socketRef.current.onopen = () => {
             console.log('WebSocket connected');
             socketRef.current.send(
-              JSON.stringify({ action: 'subscribe', code })
+              JSON.stringify({ action: 'subscribe', stock_code: code })
             );
           };
 
