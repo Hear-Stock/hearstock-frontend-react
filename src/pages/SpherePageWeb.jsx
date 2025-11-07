@@ -8,12 +8,20 @@ export default function SpherePageWeb() {
   const [currentIndex, setCurrentIndex] = useState(null);
   const [rawData, setRawData] = useState([]);
 
+  let socket = null;
+
   // Flutter → React 데이터 수신
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
     window.updateStockChart = async ({ baseUrl, code, period, market }) => {
       try {
+        // 만약 이전 websocket 살아있으면 닫기
+        if (socket) {
+          socket.close();
+          socket = null;
+        }
+
         // period가 'current_price'인 경우: WebSocket 사용
         if (period === 'current_price') {
           const wsUrl = `wss://${baseUrl.replace(
