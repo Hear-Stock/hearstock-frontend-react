@@ -9,40 +9,35 @@ export default function SpherePageWeb() {
   const [rawData, setRawData] = useState([]);
 
   const wsRef = useRef(null);
-  const lastUpdateRef = useRef(0); // 데이터 과도 업데이트 방지용
 
-  // 실시간 데이터 처리
+  // 실시간 데이터 추가
   const handleLiveData = (msg) => {
-    const now = Date.now();
-    if (now - lastUpdateRef.current < 1000) return; // 1초 간격으로만 반영
-    lastUpdateRef.current = now;
-
     setRawData((prev) => {
       const last = prev[prev.length - 1] || {};
+      const price = msg.current_price ?? last.close ?? 0;
       const newData = {
-        date: now, // X축으로 사용할 timestamp
-        open: msg.current_price,
-        high: Math.max(msg.current_price, last.high ?? msg.current_price),
-        low: Math.min(msg.current_price, last.low ?? msg.current_price),
-        close: msg.current_price,
-        price: msg.current_price,
+        timestamp: Date.now(),
+        date: new Date().toLocaleTimeString('ko-KR', { hour12: false }),
+        open: msg.open ?? last.open ?? price,
+        high: Math.max(msg.high ?? price, last.high ?? price),
+        low: Math.min(msg.low ?? price, last.low ?? price),
+        close: price,
+        price: price,
         volume: msg.volume ?? last.volume ?? 0,
         fluctuation_rate: msg.fluctuation_rate ?? last.fluctuation_rate ?? 0,
       };
-
-      // 최대 100개까지만 유지
+      // 최근 100개만 유지
       return [...prev.slice(-99), newData];
     });
   };
 
-  // Flutter에서 보내는 실시간 데이터 수신
+  // Flutter → 실시간 데이터
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
     window.updateRealTime = (data) => {
       try {
         const msg = typeof data === 'string' ? JSON.parse(data) : data;
-        console.log('Flutter 실시간 데이터 수신:', msg);
         handleLiveData(msg);
       } catch (e) {
         console.error('실시간 데이터 처리 실패:', e);
@@ -50,30 +45,20 @@ export default function SpherePageWeb() {
     };
   }, []);
 
-  // 주식 차트 데이터 로딩 + 실시간 WebSocket 연결 관리
+  // Flutter → 일반 / 실시간 데이터 로드
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
     window.updateStockChart = async ({ baseUrl, code, period, market }) => {
-      // ✅ 기존 WebSocket 연결 종료
+      // WebSocket 연결 닫기 (그래프 전환 시)
       if (wsRef.current) {
         wsRef.current.close();
         wsRef.current = null;
-        console.log('기존 WebSocket 연결 종료');
       }
 
-      // ✅ 실시간 모드
       if (period === 'live') {
-        setRawData([{
-          date: Date.now(),
-          open: 0,
-          high: 0,
-          low: 0,
-          close: 0,
-          price: 0,
-          volume: 0,
-          fluctuation_rate: 0,
-        }]);
+        // 초기화
+        setRawData([]);
 
         const wsUrl = `wss://${baseUrl.replace(/^https?:\/\//, '')}/api/stock/ws/trade-price`;
         const socket = new WebSocket(wsUrl);
@@ -85,12 +70,8 @@ export default function SpherePageWeb() {
         };
 
         socket.onmessage = (event) => {
-          try {
-            const msg = JSON.parse(event.data);
-            handleLiveData(msg);
-          } catch (e) {
-            console.error('WebSocket 데이터 파싱 실패:', e);
-          }
+          const msg = JSON.parse(event.data);
+          handleLiveData(msg);
         };
 
         socket.onerror = (err) => console.error('WebSocket error:', err);
@@ -101,19 +82,21 @@ export default function SpherePageWeb() {
         return;
       }
 
-      // ✅ 과거 데이터 로딩 (fetch)
+      // 일반 차트 모드
       try {
         const url = `${baseUrl}/api/stock/chart?code=${code}&period=${period}&market=${market}`;
         const res = await fetch(url);
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const data = await res.json();
+
         const mapped = data.map((d) => ({
-          date: d.timestamp,
+          timestamp: d.timestamp,
+          date: new Date(d.timestamp).toLocaleDateString('ko-KR'),
           open: d.open,
           high: d.high,
           low: d.low,
           close: d.close,
-          price: d.close,
+          price: d.close, // ✅ 공통 key
           volume: d.volume,
           fluctuation_rate: d.fluctuation_rate,
         }));
@@ -122,20 +105,14 @@ export default function SpherePageWeb() {
         console.error('주가 데이터 요청 실패:', err);
       }
     };
-
-    // ✅ 페이지 언마운트 시 WebSocket 정리
-    return () => {
-      if (wsRef.current) {
-        wsRef.current.close();
-        wsRef.current = null;
-        console.log('페이지 언마운트로 WebSocket 종료');
-      }
-    };
   }, []);
 
-  // 좌표 변환
+  // rawData → 변환
   const sphereCoords = useMemo(() => convertToSphericalCoords(rawData), [rawData]);
-  useEffect(() => setStockData(sphereCoords), [sphereCoords]);
+
+  useEffect(() => {
+    setStockData(sphereCoords);
+  }, [sphereCoords]);
 
   return (
     <div

@@ -1,7 +1,11 @@
 export function CustomTooltip({ active, payload, label }) {
   if (!active || !payload || !payload.length) return null;
 
-  const d = payload[0].payload;
+  const d = payload[0]?.payload || {};
+
+  // 안전하게 숫자 포맷팅
+  const safeNumber = (v) =>
+    typeof v === 'number' && !isNaN(v) ? v.toLocaleString() : '-';
 
   return (
     <div
@@ -17,30 +21,26 @@ export function CustomTooltip({ active, payload, label }) {
       }}
     >
       <div>
-        <b>{d.date}</b>
+        <b>{d.date || '날짜 없음'}</b>
       </div>
       <div>
-        <span style={{ fontWeight: 700 }}>종가</span> :{' '}
-        {d.price.toLocaleString()}원
+        <span style={{ fontWeight: 700 }}>종가</span> : {safeNumber(d.price)}원
       </div>
       <div>
-        <span style={{ fontWeight: 700 }}>시가</span> :{' '}
-        {d.open.toLocaleString()}원
+        <span style={{ fontWeight: 700 }}>시가</span> : {safeNumber(d.open)}원
       </div>
       <div>
-        <span style={{ fontWeight: 700 }}>고가</span> :{' '}
-        {d.high.toLocaleString()}원
+        <span style={{ fontWeight: 700 }}>고가</span> : {safeNumber(d.high)}원
       </div>
       <div>
-        <span style={{ fontWeight: 700 }}>저가</span> : {d.low.toLocaleString()}
-        원
+        <span style={{ fontWeight: 700 }}>저가</span> : {safeNumber(d.low)}원
       </div>
       <div>
-        <span style={{ fontWeight: 700 }}>거래량</span> :{'     '}
-        {d.volume.toLocaleString()}
+        <span style={{ fontWeight: 700 }}>거래량</span> : {safeNumber(d.volume)}
       </div>
       <div>
-        <span style={{ fontWeight: 700 }}>등락률</span> : {d.fluctuation_rate}%
+        <span style={{ fontWeight: 700 }}>등락률</span> :{' '}
+        {d.fluctuation_rate ?? '-'}%
       </div>
     </div>
   );
