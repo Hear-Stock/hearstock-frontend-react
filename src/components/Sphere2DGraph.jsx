@@ -23,43 +23,57 @@ export default function Sphere2DGraph({ points, currentIndex }) {
     bufferRef.current.push(...points);
   }, [points]);
 
-  // 1초마다 버퍼 처리해서 렌더링
+  // 1초마다 버퍼 처리
   useEffect(() => {
     const interval = setInterval(() => {
       if (bufferRef.current.length === 0) return;
 
-      const allPoints = [...bufferRef.current];
+      // 버퍼 복사 + 초기화
+      const buffer = [...bufferRef.current];
       bufferRef.current = [];
 
-      // 최신 100개만 유지
-      const latestPoints = allPoints.slice(-100);
+      // 시간별 병합: 같은 date는 마지막 current_price와 합산 volume
+      const mergedMap = new Map();
+      buffer.forEach((p) => {
+        const dateKey = p.date;
+        const existing = mergedMap.get(dateKey);
+        if (existing) {
+          existing.price = Number(p.price) || existing.price;
+          existing.volume += Number(p.volume) || 0;
+          existing.fluctuation_rate = Number(p.fluctuation_rate) || existing.fluctuation_rate;
+        } else {
+          mergedMap.set(dateKey, {
+            date: dateKey,
+            price: Number(p.price) || 0,
+            open: Number(p.open) || 0,
+            high: Number(p.high) || 0,
+            low: Number(p.low) || 0,
+            volume: Math.max(0, Number(p.volume) || 0),
+            fluctuation_rate: Number(p.fluctuation_rate) || 0,
+            active: false,
+          });
+        }
+      });
 
-      // 중복 date 제거 + 안전하게 변환
-      const processed = Array.from(
-        new Map(
-          latestPoints.map((p, i) => [
-            p.date ?? i.toString(),
-            {
-              date: p.date ?? i.toString(),
-              price: Number(p.price) || 0,
-              open: Number(p.open) || 0,
-              high: Number(p.high) || 0,
-              low: Number(p.low) || 0,
-              volume: Math.max(0, Number(p.volume) || 0),
-              fluctuation_rate: Number(p.fluctuation_rate) || 0,
-              active: i === currentIndex,
-            },
-          ])
-        ).values()
-      ).sort((a, b) => new Date(a.date) - new Date(b.date));
+      // 최신 100개만
+      const mergedArray = Array.from(mergedMap.values())
+        .sort((a, b) => new Date(a.date) - new Date(b.date))
+        .slice(-100);
 
-      setData(processed);
-    }, 1000); // 초당 1번 업데이트
+      // currentIndex 적용
+      if (currentIndex !== null && currentIndex >= 0) {
+        mergedArray.forEach((d, i) => {
+          d.active = i === currentIndex;
+        });
+      }
+
+      setData(mergedArray);
+    }, 1000);
 
     return () => clearInterval(interval);
   }, [currentIndex]);
 
-  // 최소/최대값 계산 (useMemo 항상 최상위 호출)
+  // 최소/최대값
   const prices = useMemo(() => data.map(d => d.price).filter(v => !isNaN(v)), [data]);
   const minPrice = prices.length ? Math.min(...prices) : 0;
   const maxPrice = prices.length ? Math.max(...prices) : 0;
@@ -111,17 +125,19 @@ export default function Sphere2DGraph({ points, currentIndex }) {
             isAnimationActive={true}
           />
 
-          {currentIndex !== null && currentIndex >= 0 && data[currentIndex] && (
-            <ReferenceDot
-              x={data[currentIndex].date}
-              y={data[currentIndex].price}
-              r={7}
-              fill="red"
-              stroke="white"
-              strokeWidth={2}
-              className="pulse-dot"
-            />
-          )}
+          {currentIndex !== null &&
+            currentIndex >= 0 &&
+            data[currentIndex] && (
+              <ReferenceDot
+                x={data[currentIndex].date}
+                y={data[currentIndex].price}
+                r={7}
+                fill="red"
+                stroke="white"
+                strokeWidth={2}
+                className="pulse-dot"
+              />
+            )}
         </LineChart>
       </ResponsiveContainer>
     </div>
