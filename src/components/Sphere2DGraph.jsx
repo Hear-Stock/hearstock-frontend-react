@@ -13,9 +13,26 @@ import {
 import './Sphere2DGraph.css';
 import { CustomTooltip } from './CustomTooltip.jsx';
 
-export default function Sphere2DGraph({ points, currentIndex }) {
+export default function Sphere2DGraph({ points, currentIndex, pastData }) {
   const bufferRef = useRef([]);
   const [data, setData] = useState([]);
+
+  // 초기 과거 데이터 (장 시작부터)
+  useEffect(() => {
+    if (pastData && pastData.length > 0) {
+      const initialData = pastData.map((p) => ({
+        date: p.date,
+        price: Number(p.price) || 0,
+        open: Number(p.open) || 0,
+        high: Number(p.high) || 0,
+        low: Number(p.low) || 0,
+        volume: Math.max(0, Number(p.volume) || 0),
+        fluctuation_rate: Number(p.fluctuation_rate) || 0,
+        active: false,
+      }));
+      setData(initialData);
+    }
+  }, [pastData]);
 
   // 실시간 points가 들어올 때마다 버퍼에 쌓기
   useEffect(() => {
@@ -23,17 +40,19 @@ export default function Sphere2DGraph({ points, currentIndex }) {
     bufferRef.current.push(...points);
   }, [points]);
 
-  // 1초마다 버퍼 처리
+  // 1초마다 버퍼 처리 (실시간)
   useEffect(() => {
     const interval = setInterval(() => {
       if (bufferRef.current.length === 0) return;
 
-      // 버퍼 복사 + 초기화
       const buffer = [...bufferRef.current];
       bufferRef.current = [];
 
-      // 시간별 병합: 같은 date는 마지막 current_price와 합산 volume
       const mergedMap = new Map();
+      // 기존 데이터 포함
+      data.forEach((p) => mergedMap.set(p.date, { ...p }));
+
+      // 실시간 데이터 버퍼 합성
       buffer.forEach((p) => {
         const dateKey = p.date;
         const existing = mergedMap.get(dateKey);
@@ -55,10 +74,8 @@ export default function Sphere2DGraph({ points, currentIndex }) {
         }
       });
 
-      // 최신 100개만
-      const mergedArray = Array.from(mergedMap.values())
-        .sort((a, b) => new Date(a.date) - new Date(b.date))
-        .slice(-100);
+      let mergedArray = Array.from(mergedMap.values())
+        .sort((a, b) => new Date(a.date) - new Date(b.date));
 
       // currentIndex 적용
       if (currentIndex !== null && currentIndex >= 0) {
@@ -67,19 +84,22 @@ export default function Sphere2DGraph({ points, currentIndex }) {
         });
       }
 
+      // 최신 100개만
+      mergedArray = mergedArray.slice(-100);
+
       setData(mergedArray);
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [currentIndex]);
+  }, [currentIndex, data]);
 
   // 최소/최대값
-  const prices = useMemo(() => data.map(d => d.price).filter(v => !isNaN(v)), [data]);
+  const prices = useMemo(() => data.map((d) => d.price).filter((v) => !isNaN(v)), [data]);
   const minPrice = prices.length ? Math.min(...prices) : 0;
   const maxPrice = prices.length ? Math.max(...prices) : 0;
   const margin = (maxPrice - minPrice) * 0.1;
 
-  if (data.length === 0) {
+  if (!data || data.length === 0) {
     return (
       <div
         className="graph-wrapper"
@@ -93,10 +113,7 @@ export default function Sphere2DGraph({ points, currentIndex }) {
   return (
     <div className="graph-wrapper">
       <ResponsiveContainer width="100%" height={400}>
-        <LineChart
-          data={data}
-          margin={{ top: 20, right: 30, left: 10, bottom: 0 }}
-        >
+        <LineChart data={data} margin={{ top: 20, right: 30, left: 10, bottom: 0 }}>
           <defs>
             <linearGradient id="colorPrice" x1="0" y1="0" x2="0" y2="1">
               <stop offset="0%" stopColor="#191919" stopOpacity={1} />
