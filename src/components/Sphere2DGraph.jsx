@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
 import {
   LineChart,
   Line,
@@ -14,27 +14,56 @@ import './Sphere2DGraph.css';
 import { CustomTooltip } from './CustomTooltip.jsx';
 
 export default function Sphere2DGraph({ points, currentIndex }) {
-  // ✅ 안전하게 데이터 정리
-  const data = useMemo(() => {
-    if (!points || points.length === 0) return [];
+  const bufferRef = useRef([]);
+  const [data, setData] = useState([]);
 
-    // 1️⃣ 너무 많은 점 제한 (최신 100개만 유지)
-    const limited = points.slice(-100);
+  // 실시간 points가 들어올 때마다 버퍼에 쌓기
+  useEffect(() => {
+    if (!points || points.length === 0) return;
+    bufferRef.current.push(...points);
+  }, [points]);
 
-    // 2️⃣ 최신 데이터가 오른쪽에 오도록 정렬
-    return limited
-      .map((p, i) => ({
-        date: p.date ?? i.toString(),
-        price: Number(p.price) || 0,
-        open: Number(p.open) || 0,
-        high: Number(p.high) || 0,
-        low: Number(p.low) || 0,
-        volume: Number(p.volume) || 0,
-        fluctuation_rate: Number(p.fluctuation_rate) || 0,
-        active: i === currentIndex,
-      }))
-      .sort((a, b) => new Date(a.date) - new Date(b.date)); // 날짜 순 정렬
-  }, [points, currentIndex]);
+  // 1초마다 버퍼 처리해서 렌더링
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (bufferRef.current.length === 0) return;
+
+      const allPoints = [...bufferRef.current];
+      bufferRef.current = [];
+
+      // 최신 100개만 유지
+      const latestPoints = allPoints.slice(-100);
+
+      // 중복 date 제거 + 안전하게 변환
+      const processed = Array.from(
+        new Map(
+          latestPoints.map((p, i) => [
+            p.date ?? i.toString(),
+            {
+              date: p.date ?? i.toString(),
+              price: Number(p.price) || 0,
+              open: Number(p.open) || 0,
+              high: Number(p.high) || 0,
+              low: Number(p.low) || 0,
+              volume: Math.max(0, Number(p.volume) || 0),
+              fluctuation_rate: Number(p.fluctuation_rate) || 0,
+              active: i === currentIndex,
+            },
+          ])
+        ).values()
+      ).sort((a, b) => new Date(a.date) - new Date(b.date));
+
+      setData(processed);
+    }, 1000); // 초당 1번 업데이트
+
+    return () => clearInterval(interval);
+  }, [currentIndex]);
+
+  // 최소/최대값 계산 (useMemo 항상 최상위 호출)
+  const prices = useMemo(() => data.map(d => d.price).filter(v => !isNaN(v)), [data]);
+  const minPrice = prices.length ? Math.min(...prices) : 0;
+  const maxPrice = prices.length ? Math.max(...prices) : 0;
+  const margin = (maxPrice - minPrice) * 0.1;
 
   if (data.length === 0) {
     return (
@@ -47,12 +76,6 @@ export default function Sphere2DGraph({ points, currentIndex }) {
     );
   }
 
-  // ✅ 최소, 최대값 계산 (안정성 확보)
-  const prices = data.map((d) => d.price).filter((v) => !isNaN(v));
-  const minPrice = Math.min(...prices);
-  const maxPrice = Math.max(...prices);
-  const margin = (maxPrice - minPrice) * 0.1;
-
   return (
     <div className="graph-wrapper">
       <ResponsiveContainer width="100%" height={400}>
@@ -62,8 +85,8 @@ export default function Sphere2DGraph({ points, currentIndex }) {
         >
           <defs>
             <linearGradient id="colorPrice" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#191919" stopOpacity={0.8} />
-              <stop offset="100%" stopColor="#191919" stopOpacity={0.1} />
+              <stop offset="0%" stopColor="#191919" stopOpacity={1} />
+              <stop offset="100%" stopColor="#191919" stopOpacity={1} />
             </linearGradient>
           </defs>
 
@@ -88,10 +111,10 @@ export default function Sphere2DGraph({ points, currentIndex }) {
             isAnimationActive={true}
           />
 
-          {currentIndex !== null && currentIndex >= 0 && (
+          {currentIndex !== null && currentIndex >= 0 && data[currentIndex] && (
             <ReferenceDot
-              x={data[currentIndex]?.date}
-              y={data[currentIndex]?.price}
+              x={data[currentIndex].date}
+              y={data[currentIndex].price}
               r={7}
               fill="red"
               stroke="white"
