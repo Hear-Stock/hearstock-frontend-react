@@ -22,21 +22,26 @@ export default function Sphere2DGraph({ points, currentIndex }) {
     const limited = points.slice(-100);
 
     // 2️⃣ 최신 데이터가 오른쪽에 오도록 정렬
-    return limited.map((p, i) => ({
-      date: p.date ?? i.toString(),
-      price: Number(p.price) || 0,
-      open: Number(p.open) || 0,
-      high: Number(p.high) || 0,
-      low: Number(p.low) || 0,
-      volume: Number(p.volume) || 0,
-      fluctuation_rate: Number(p.fluctuation_rate) || 0,
-      active: i === currentIndex,
-    }));
+    return limited
+      .map((p, i) => ({
+        date: p.date ?? i.toString(),
+        price: Number(p.price) || 0,
+        open: Number(p.open) || 0,
+        high: Number(p.high) || 0,
+        low: Number(p.low) || 0,
+        volume: Number(p.volume) || 0,
+        fluctuation_rate: Number(p.fluctuation_rate) || 0,
+        active: i === currentIndex,
+      }))
+      .sort((a, b) => new Date(a.date) - new Date(b.date)); // 날짜 순 정렬
   }, [points, currentIndex]);
 
   if (data.length === 0) {
     return (
-      <div className="graph-wrapper" style={{ color: '#ccc', textAlign: 'center', padding: 30 }}>
+      <div
+        className="graph-wrapper"
+        style={{ color: '#ccc', textAlign: 'center', padding: 30 }}
+      >
         데이터를 불러오는 중입니다...
       </div>
     );
